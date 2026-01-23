@@ -1,0 +1,8 @@
+
+{
+  "name": "Rwooga 3D Studio",
+  "description": "Professional 3D visualization, animation, and custom 3D printing services website.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}
