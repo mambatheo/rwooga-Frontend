@@ -12,6 +12,8 @@ import Shop from './pages/Shop';
 import CustomRequest from './pages/CustomRequest';
 import Contact from './pages/Contact';
 import Admin from './pages/Admin';
+import Login from './pages/Login';
+import Signup from './pages/Signup';
 
 // Components
 import Footer from './components/Footer';
@@ -19,6 +21,21 @@ import Footer from './components/Footer';
 const App: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isCustomPrintingEnabled, setIsCustomPrintingEnabled] = useState(true);
+  const [user, setUser] = useState<{ name: string; email: string; role: string } | null>(null);
+
+  // Load user from localStorage
+  useEffect(() => {
+    const storedUser = localStorage.getItem('rwooga_user');
+    if (storedUser) {
+      setUser(JSON.parse(storedUser));
+    }
+  }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem('rwooga_user');
+    setUser(null);
+    window.location.hash = '/';
+  };
 
   // Initialize printing state from localStorage
   useEffect(() => {
@@ -57,8 +74,8 @@ const App: React.FC = () => {
                 <NavLink to="/portfolio">Portfolio</NavLink>
                 <NavLink to="/shop">Shop</NavLink>
                 {isCustomPrintingEnabled && (
-                  <Link 
-                    to="/custom-request" 
+                  <Link
+                    to="/custom-request"
                     className="bg-brand-cyan text-white px-5 py-2.5 rounded-full font-semibold hover:bg-opacity-90 transition-all shadow-md shadow-cyan-100"
                   >
                     Custom Design
@@ -67,11 +84,45 @@ const App: React.FC = () => {
                 <Link to="/contact" className="text-gray-600 hover:text-brand-dark transition-colors">
                   Contact
                 </Link>
+
+                <div className="h-6 w-px bg-gray-200" />
+
+                {user ? (
+                  <div className="flex items-center space-x-4">
+                    <div className="flex flex-col items-end">
+                      <span className="text-xs font-bold text-gray-400 uppercase tracking-widest">{user.role}</span>
+                      <span className="text-sm font-bold text-brand-dark">{user.name}</span>
+                    </div>
+                    {user.role === 'admin' && (
+                      <Link to="/admin" className="p-2 bg-gray-100 rounded-lg text-gray-600 hover:text-brand-dark transition-colors">
+                        <Settings size={20} />
+                      </Link>
+                    )}
+                    <button
+                      onClick={handleLogout}
+                      className="text-sm font-bold text-red-500 hover:text-red-600 transition-colors"
+                    >
+                      Logout
+                    </button>
+                  </div>
+                ) : (
+                  <div className="flex items-center space-x-4">
+                    <Link to="/login" className="text-gray-600 hover:text-brand-dark font-semibold">
+                      Login
+                    </Link>
+                    <Link
+                      to="/signup"
+                      className="bg-brand-dark text-white px-5 py-2 rounded-xl font-bold hover:bg-gray-800 transition-all"
+                    >
+                      Sign Up
+                    </Link>
+                  </div>
+                )}
               </div>
 
               {/* Mobile Menu Button */}
               <div className="md:hidden flex items-center">
-                <button 
+                <button
                   onClick={() => setIsMenuOpen(!isMenuOpen)}
                   className="text-brand-dark p-2"
                 >
@@ -94,6 +145,43 @@ const App: React.FC = () => {
                   <MobileNavLink to="/custom-request" onClick={() => setIsMenuOpen(false)}>Custom Request</MobileNavLink>
                 )}
                 <MobileNavLink to="/contact" onClick={() => setIsMenuOpen(false)}>Contact</MobileNavLink>
+
+                <div className="pt-4 mt-4 border-t border-gray-100 flex flex-col space-y-3">
+                  {user ? (
+                    <>
+                      <div className="px-3 py-2">
+                        <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">{user.role}</p>
+                        <p className="text-lg font-bold text-brand-dark">{user.name}</p>
+                      </div>
+                      {user.role === 'admin' && (
+                        <MobileNavLink to="/admin" onClick={() => setIsMenuOpen(false)}>Admin Dashboard</MobileNavLink>
+                      )}
+                      <button
+                        onClick={() => { handleLogout(); setIsMenuOpen(false); }}
+                        className="w-full text-left px-3 py-4 text-lg font-semibold text-red-500 hover:bg-red-50 rounded-lg"
+                      >
+                        Logout
+                      </button>
+                    </>
+                  ) : (
+                    <>
+                      <Link
+                        to="/login"
+                        onClick={() => setIsMenuOpen(false)}
+                        className="block px-3 py-4 text-lg font-semibold text-gray-700 hover:bg-gray-50 rounded-lg"
+                      >
+                        Login
+                      </Link>
+                      <Link
+                        to="/signup"
+                        onClick={() => setIsMenuOpen(false)}
+                        className="block mx-3 px-3 py-4 text-lg font-bold text-center bg-brand-dark text-white rounded-xl shadow-lg"
+                      >
+                        Sign Up
+                      </Link>
+                    </>
+                  )}
+                </div>
               </div>
             </div>
           )}
@@ -110,15 +198,17 @@ const App: React.FC = () => {
             <Route path="/custom-request" element={<CustomRequest isEnabled={isCustomPrintingEnabled} />} />
             <Route path="/contact" element={<Contact />} />
             <Route path="/admin" element={<Admin isEnabled={isCustomPrintingEnabled} onToggle={togglePrinting} />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/signup" element={<Signup />} />
           </Routes>
         </main>
 
         <Footer />
 
         {/* Floating WhatsApp Button */}
-        <a 
-          href="https://wa.me/250784269593" 
-          target="_blank" 
+        <a
+          href="https://wa.me/250784269593"
+          target="_blank"
           rel="noopener noreferrer"
           className="fixed bottom-8 right-8 z-50 bg-[#25D366] text-white p-4 rounded-full shadow-2xl hover:scale-110 active:scale-95 transition-all flex items-center justify-center group"
         >
@@ -128,14 +218,6 @@ const App: React.FC = () => {
           <MessageCircle size={28} />
         </a>
 
-        {/* Hidden Admin Entry (For Demo Only) */}
-        <Link 
-          to="/admin" 
-          className="fixed bottom-8 left-8 opacity-20 hover:opacity-100 transition-opacity"
-          title="Admin Panel"
-        >
-          <Settings size={20} className="text-gray-400" />
-        </Link>
       </div>
     </Router>
   );
@@ -146,8 +228,8 @@ const NavLink: React.FC<{ to: string; children: React.ReactNode }> = ({ to, chil
   const location = useLocation();
   const isActive = location.pathname === to;
   return (
-    <Link 
-      to={to} 
+    <Link
+      to={to}
       className={`font-medium transition-colors ${isActive ? 'text-brand-cyan' : 'text-gray-600 hover:text-brand-dark'}`}
     >
       {children}
@@ -159,8 +241,8 @@ const MobileNavLink: React.FC<{ to: string; onClick: () => void; children: React
   const location = useLocation();
   const isActive = location.pathname === to;
   return (
-    <Link 
-      to={to} 
+    <Link
+      to={to}
       onClick={onClick}
       className={`block px-3 py-4 text-lg font-semibold rounded-lg ${isActive ? 'bg-brand-cyan/10 text-brand-cyan' : 'text-gray-700 hover:bg-gray-50'}`}
     >
