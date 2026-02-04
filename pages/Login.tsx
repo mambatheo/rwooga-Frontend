@@ -2,13 +2,11 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { ShieldAlert, ShieldCheck, Eye, EyeOff } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { useAuth } from '../context/AuthContext';
 import { authService } from '../services/authService';
 
-interface LoginProps {
-    onLogin: (user: { name: string; email: string; role: string }) => void;
-}
-
-const Login: React.FC<LoginProps> = ({ onLogin }) => {
+const Login: React.FC = () => {
+    const { login, loading, error: authError, clearError } = useAuth();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [resetCode, setResetCode] = useState('');
@@ -25,29 +23,16 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
         setError('');
+        clearError();
 
         try {
-            const data = await authService.login({ email, password });
+            await login({ email, password });
 
-            // The API returns access and refresh tokens
-            localStorage.setItem('access_token', data.access);
-            localStorage.setItem('refresh_token', data.refresh);
-
-            // Mock user role based on email for now as profile endpoint is excluded
-            const role = email === 'admin@rwooga.com' ? 'admin' : 'user';
-            const user = { email, role, name: email.split('@')[0] };
-
-            onLogin(user);
             toast.success(`Welcome back!`);
-
-            if (role === 'admin') {
-                navigate('/admin');
-            } else {
-                navigate('/');
-            }
+            navigate('/');
         } catch (err: any) {
-            setError(err.message || 'Invalid email or password');
-            toast.error(err.message || 'Invalid email or password');
+            setError(err || 'Invalid email or password');
+            toast.error(err || 'Invalid email or password');
         }
     };
 
@@ -162,9 +147,15 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
 
                             <button
                                 type="submit"
-                                className="w-full bg-brand-primary text-black font-bold text-lg py-4 rounded-2xl hover:brightness-110 active:scale-[0.99] transition-all shadow-lg shadow-brand-primary/20"
+                                disabled={loading}
+                                className="w-full bg-brand-primary text-black font-bold text-lg py-4 rounded-2xl hover:brightness-110 active:scale-[0.99] transition-all shadow-lg shadow-brand-primary/20 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
                             >
-                                Log In
+                                {loading ? (
+                                    <>
+                                        <div className="w-5 h-5 border-2 border-black border-t-transparent rounded-full animate-spin mr-2" />
+                                        Logging in...
+                                    </>
+                                ) : 'Log In'}
                             </button>
                         </form>
 

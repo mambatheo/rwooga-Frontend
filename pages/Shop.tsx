@@ -1,15 +1,20 @@
 
 import React, { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { ShoppingBag, ArrowRight, ShoppingCart, X, Trash2 } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { PRODUCTS, WHATSAPP_NUMBER } from '../constants'
+import { PRODUCTS } from '../constants'
 import toast from 'react-hot-toast'
+import { useDispatch, useSelector } from 'react-redux'
+import { AppDispatch, RootState } from '../store'
+import { addToCart, removeFromCart } from '../store/slices/cartSlice'
 
 const Shop = () => {
   const [selectedCategory, setSelectedCategory] = useState('All')
-  const [cart, setCart] = useState<any[]>([])
   const [showCart, setShowCart] = useState(false)
+  const navigate = useNavigate()
+  const dispatch = useDispatch<AppDispatch>()
+  const { items: cart, total } = useSelector((state: RootState) => state.cart)
 
   const categories = ['All', ...new Set(PRODUCTS.map(p => p.category))]
 
@@ -19,29 +24,22 @@ const Shop = () => {
       : PRODUCTS.filter(p => p.category === selectedCategory)
 
   // --- Cart Logic ---
-  const addToCart = (product: any) => {
-    setCart([...cart, product])
+  const handleAddToCart = (product: any) => {
+    dispatch(addToCart(product))
     setShowCart(true)
     toast.success(`${product.name} added to cart!`)
   }
 
-  const removeFromCart = (id: string) => {
+  const handleRemoveFromCart = (id: string) => {
     const item = cart.find(i => i.id === id);
-    setCart(cart.filter((item) => item.id !== id))
+    dispatch(removeFromCart(id))
     if (item) toast.success(`${item.name} removed from cart`);
   }
 
-  const checkout = () => {
+  const goToCheckout = () => {
     if (cart.length === 0) return
-    const items = cart.map(item => `${item.name} - ${item.price.toLocaleString()} ${item.currency}`).join('%0A')
-    const total = cart.reduce((sum, item) => sum + item.price, 0)
-    const message = encodeURIComponent(
-      `Hello Rwooga! I'm interested in purchasing:%0A%0A${items}%0A%0ATotal: ${total.toLocaleString()} RWF`
-    )
-    window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${message}`, '_blank')
-    setCart([])
     setShowCart(false)
-    toast.success('Redirecting to WhatsApp for payment...')
+    navigate('/checkout')
   }
 
   return (
@@ -96,7 +94,7 @@ const Shop = () => {
                 key={product.id}
                 product={product}
                 index={index}
-                onAddToCart={addToCart}
+                onAddToCart={handleAddToCart}
               />
             ))}
           </AnimatePresence>
@@ -116,7 +114,7 @@ const Shop = () => {
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-8">
             <div className="max-w-xl">
               <h4 className="text-2xl font-bold text-white mb-4 uppercase tracking-tight"> Secure Delivery & Payments </h4>
-              <p className="text-gray-400 leading-relaxed"> All payments are handled securely via Mobile Money upon order confirmation on WhatsApp. We offer national delivery across Rwanda. </p>
+              <p className="text-gray-400 leading-relaxed"> All payments are handled securely via Mobile Money or Card. We offer national delivery across Rwanda. </p>
             </div>
             <Link to="/contact" className="px-10 py-5 bg-white text-black rounded-full font-bold hover:bg-brand-primary transition-all text-center">
               INQUIRE NOW
@@ -162,7 +160,7 @@ const Shop = () => {
                 ) : (
                   cart.map((item, idx) => (
                     <motion.div
-                      key={idx}
+                      key={`${item.id}-${idx}`}
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
                       className="flex gap-6 p-6 bg-white/3 rounded-3xl border border-white/5 group"
@@ -172,7 +170,7 @@ const Shop = () => {
                         <div className="flex justify-between items-start mb-2">
                           <h4 className="text-lg font-bold text-white">{item.name}</h4>
                           <button
-                            onClick={() => removeFromCart(item.id)}
+                            onClick={() => handleRemoveFromCart(item.id)}
                             className="text-gray-500 hover:text-red-500 transition-colors"
                           >
                             <Trash2 size={18} />
@@ -190,15 +188,15 @@ const Shop = () => {
                   <div className="flex justify-between items-end">
                     <span className="text-gray-500 font-bold uppercase tracking-widest text-xs">Total Amount</span>
                     <span className="text-4xl font-display font-bold text-white tracking-tighter">
-                      {cart.reduce((sum, item) => sum + item.price, 0).toLocaleString()} <span className="text-lg">RWF</span>
+                      {total.toLocaleString()} <span className="text-lg">RWF</span>
                     </span>
                   </div>
 
                   <button
                     className="w-full bg-brand-primary text-black py-6 rounded-3xl font-bold flex items-center justify-center gap-3 hover:scale-[1.02] transition-all text-lg shadow-xl shadow-brand-primary/20"
-                    onClick={checkout}
+                    onClick={goToCheckout}
                   >
-                    CHECKOUT ON WHATSAPP <ArrowRight size={24} />
+                    PROCEED TO CHECKOUT <ArrowRight size={24} />
                   </button>
                 </div>
               )}

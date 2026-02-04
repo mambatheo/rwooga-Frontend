@@ -1,6 +1,7 @@
 
 import React, { useRef } from 'react';
 import { Target, Users, Zap, Shield } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { motion, useScroll, useTransform, useSpring } from 'framer-motion';
 
 // Assets
@@ -42,6 +43,35 @@ const About: React.FC = () => {
             </p>
           </div>
         </motion.div>
+
+        {/* Stats Section */}
+        <div className="mb-40 flex flex-col items-center">
+          <Link
+            to="/portfolio"
+            className="bg-brand-primary/[0.08] hover:bg-brand-primary/[0.15] text-brand-primary px-8 py-3 rounded-full font-bold text-sm tracking-widest uppercase transition-all mb-20 border border-brand-primary/20"
+          >
+            View our Work
+          </Link>
+
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-12 md:gap-24 w-full">
+            <StatItem
+              number="500+"
+              label="Projects Delivered"
+            />
+            <StatItem
+              number="99%"
+              label="Client Satisfaction"
+            />
+            <StatItem
+              number="24h"
+              label="Quote Turnaround"
+            />
+            <StatItem
+              number="4K"
+              label="Native Resolution"
+            />
+          </div>
+        </div>
 
         {/* Content Block 1 */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-24 items-center mb-40">
@@ -123,6 +153,20 @@ const About: React.FC = () => {
     </div>
   );
 };
+
+const StatItem: React.FC<{ number: string; label: string }> = ({ number, label }) => (
+  <div className="flex flex-col items-center text-center">
+    <h3
+      className="text-5xl md:text-7xl font-display font-black leading-none mb-4"
+      style={{ color: '#008000' }}
+    >
+      {number}
+    </h3>
+    <span className="text-[10px] md:text-xs font-bold text-gray-500 uppercase tracking-[0.3em] font-sans">
+      {label}
+    </span>
+  </div>
+);
 
 const AboutFeature: React.FC<{ icon: React.ReactNode; title: string; desc: string }> = ({ icon, title, desc }) => (
   <div className="p-12 hover:bg-white/5 transition-colors group">

@@ -1,11 +1,22 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Mail, Phone, MapPin, Instagram, Twitter, Youtube } from 'lucide-react';
+import { Mail, Phone, MapPin, Instagram, Youtube } from 'lucide-react';
 import { BRAND_EMAIL, WHATSAPP_NUMBER } from '../constants';
 
 // Assets
 import logo from '../assets/Rwooga logo.png';
+
+const XIcon: React.FC<{ size?: number }> = ({ size = 20 }) => (
+  <svg
+    width={size}
+    height={size}
+    viewBox="0 0 24 24"
+    fill="currentColor"
+  >
+    <path d="M18.901 1.153h3.68l-8.04 9.19L24 22.846h-7.406l-5.8-7.584-6.638 7.584H.474l8.6-9.83L0 1.154h7.594l5.243 6.932L18.901 1.153zm-1.29 19.494h2.039L6.482 3.239h-2.19L17.61 20.647z" />
+  </svg>
+);
 
 const Tiktok: React.FC<{ size?: number }> = ({ size = 24 }) => (
   <svg
@@ -37,7 +48,7 @@ const Footer: React.FC = () => {
             </p>
             <div className="flex space-x-6">
               <SocialIcon icon={<Instagram size={20} />} href="https://www.instagram.com/rwooga.ent?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw==" />
-              <SocialIcon icon={<Twitter size={20} />} href="https://x.com/PhedoKat" />
+              <SocialIcon icon={<XIcon size={18} />} href="https://x.com/PhedoKat" />
               <SocialIcon icon={<Youtube size={20} />} href="https://www.youtube.com/@phedokat9549" />
               <SocialIcon icon={<Tiktok size={20} />} href="https://www.tiktok.com/@phedish?_r=1&_t=ZS-93aOKvDhzme" />
             </div>
@@ -46,7 +57,7 @@ const Footer: React.FC = () => {
 
           {/* Quick Links */}
           <div>
-            <h3 className="text-xs font-bold text-gray-500 uppercase tracking-[0.3em] mb-10">Explore</h3>
+            <h3 className="text-xs font-bold text-brand-primary uppercase tracking-[0.3em] mb-10">Explore</h3>
             <ul className="space-y-4 text-white font-bold text-lg">
               <li><Link to="/services" className="hover:text-brand-primary transition-colors">Our services</Link></li>
               <li><Link to="/portfolio" className="hover:text-brand-primary transition-colors">Portfolio</Link></li>
@@ -57,7 +68,7 @@ const Footer: React.FC = () => {
 
           {/* Support */}
           <div>
-            <h3 className="text-xs font-bold text-gray-500 uppercase tracking-[0.3em] mb-10">Support</h3>
+            <h3 className="text-xs font-bold text-brand-primary uppercase tracking-[0.3em] mb-10">Support</h3>
             <ul className="space-y-4 text-white font-bold text-lg">
               <li><Link to="/about" className="hover:text-brand-primary transition-colors">About us</Link></li>
               <li><Link to="/contact" className="hover:text-brand-primary transition-colors">Contact</Link></li>
@@ -68,7 +79,7 @@ const Footer: React.FC = () => {
 
           {/* Contact */}
           <div>
-            <h3 className="text-xs font-bold text-gray-500 uppercase tracking-[0.3em] mb-10">Get in Touch</h3>
+            <h3 className="text-xs font-bold text-brand-primary uppercase tracking-[0.3em] mb-10">Get in Touch</h3>
             <ul className="space-y-8">
               <li className="group">
                 <span className="text-[10px] text-gray-500 uppercase tracking-widest block mb-2">Email us</span>

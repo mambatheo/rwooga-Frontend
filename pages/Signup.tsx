@@ -2,9 +2,10 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { ShieldCheck, Eye, EyeOff } from 'lucide-react';
 import toast from 'react-hot-toast';
-import { authService } from '../services/authService';
+import { useAuth } from '../context/AuthContext';
 
 const Signup: React.FC = () => {
+    const { register, loading, error: authError, clearError } = useAuth();
     const [formData, setFormData] = useState({
         name: '',
         phone: '',
@@ -45,7 +46,8 @@ const Signup: React.FC = () => {
                 return;
             }
 
-            await authService.register({
+            clearError();
+            await register({
                 full_name: formData.name,
                 email: formData.email,
                 phone_number: cleanedPhone,
@@ -57,11 +59,11 @@ const Signup: React.FC = () => {
             toast.success('Account created! Please check your email for verification.');
             setTimeout(() => {
                 navigate('/login');
-            }, 3000);
+            }, 5000);
         } catch (err: any) {
             console.error('Signup Error:', err);
-            setError(err.message || 'Registration failed');
-            toast.error(err.message || 'Registration failed');
+            setError(err || 'Registration failed');
+            toast.error(err || 'Registration failed');
         }
     };
 
@@ -75,9 +77,9 @@ const Signup: React.FC = () => {
                     <p className="text-gray-400">Join our studio to start your journey</p>
                 </div>
 
-                {error && (
+                {(error || authError) && (
                     <div className="mb-6 p-4 bg-red-500/10 border border-red-500/20 text-red-400 rounded-2xl flex items-center space-x-3 text-sm font-bold">
-                        <span>{error}</span>
+                        <span>{error || authError}</span>
                     </div>
                 )}
 
@@ -87,7 +89,7 @@ const Signup: React.FC = () => {
                             <ShieldCheck size={40} />
                         </div>
                         <h3 className="text-2xl font-bold text-white mb-4">Account Created</h3>
-                        <p className="text-gray-400">Redirecting to login...</p>
+                        <p className="text-gray-400">Please check your email to verify your account. Redirecting to login...</p>
                     </div>
                 ) : (
                     <form onSubmit={handleSignup} className="space-y-5">
@@ -177,9 +179,15 @@ const Signup: React.FC = () => {
 
                         <button
                             type="submit"
-                            className="w-full bg-brand-primary text-black font-bold text-lg py-4 rounded-2xl hover:brightness-110 active:scale-[0.99] transition-all shadow-lg shadow-brand-primary/20 mt-4"
+                            disabled={loading}
+                            className="w-full bg-brand-primary text-black font-bold text-lg py-4 rounded-2xl hover:brightness-110 active:scale-[0.99] transition-all shadow-lg shadow-brand-primary/20 mt-4 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
                         >
-                            Create Account
+                            {loading ? (
+                                <>
+                                    <div className="w-5 h-5 border-2 border-black border-t-transparent rounded-full animate-spin mr-2" />
+                                    Creating Account...
+                                </>
+                            ) : 'Create Account'}
                         </button>
                     </form>
                 )}

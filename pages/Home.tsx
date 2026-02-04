@@ -8,6 +8,8 @@ import { SERVICES, PORTFOLIO, getIcon } from '../constants';
 // Assets
 import heroImg from '../assets/Maguru photoshoot.png';
 import heroVideo from '../assets/MAGURU N_INSIBIKA MOVIE first look.mp4';
+import planetsBg from '../assets/20 Strange Planets That Are Both Interesting And Terrifying (1).jpg';
+import titleTexture from '../assets/download (37).jpg';
 
 const Home: React.FC<{ isPrintingEnabled: boolean }> = ({ isPrintingEnabled }) => {
   const heroRef = useRef(null);
@@ -22,7 +24,6 @@ const Home: React.FC<{ isPrintingEnabled: boolean }> = ({ isPrintingEnabled }) =
     restDelta: 0.001
   });
 
-  const videoScale = useTransform(smoothProgress, [0, 1], [1, 1.1]);
   const opacity = useTransform(smoothProgress, [0, 0.5], [1, 0]);
   const heroTextY = useTransform(smoothProgress, [0, 1], [0, -80]);
 
@@ -30,10 +31,21 @@ const Home: React.FC<{ isPrintingEnabled: boolean }> = ({ isPrintingEnabled }) =
     <div className="bg-brand-dark overflow-hidden">
       {/* Redesigned Hero Section */}
       <section ref={heroRef} className="relative min-h-screen flex flex-col items-center pt-32 pb-20 px-4 sm:px-6 lg:px-8">
-        {/* Background Radial Glow */}
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_40%,rgba(16,185,129,0.1)_0%,transparent_50%)] pointer-events-none" />
+        {/* Background Image Limited to Upper Section */}
+        <div className="absolute top-0 left-0 w-full h-[80vh] z-0 pointer-events-none overflow-hidden">
+          <motion.img
+            src={planetsBg}
+            style={{ y: useTransform(smoothProgress, [0, 1], [0, 100]), scale: 1.05 }}
+            className="w-full h-full object-cover opacity-15 translate-y-[-10%]"
+            alt="Background Planets"
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-brand-dark/0 via-brand-dark/60 to-brand-dark" />
+        </div>
 
-        <div className="max-w-7xl mx-auto w-full relative z-10 flex flex-col items-center">
+        {/* Background Radial Glow */}
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_40%,rgba(16,185,129,0.15)_0%,transparent_50%)] pointer-events-none z-10" />
+
+        <div className="max-w-7xl mx-auto w-full relative z-20 flex flex-col items-center">
           {/* Top Stage: Title & Intro */}
           <motion.div
             style={{ opacity, y: heroTextY }}
@@ -43,9 +55,10 @@ const Home: React.FC<{ isPrintingEnabled: boolean }> = ({ isPrintingEnabled }) =
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8 }}
-              className="text-6xl md:text-[110px] font-brand font-bold text-brand-primary leading-[0.9] mb-8 tracking-[-0.04em]"
+              className="text-5xl md:text-[100px] font-brand font-bold leading-tight mb-8 tracking-[-0.02em]"
+              style={{ color: '#008000' }}
             >
-              Visualize <br /> the future
+              Visualize the future
             </motion.h1>
             <motion.p
               initial={{ opacity: 0 }}
@@ -104,12 +117,15 @@ const Home: React.FC<{ isPrintingEnabled: boolean }> = ({ isPrintingEnabled }) =
             </motion.div>
           </div>
 
-          {/* Bottom Stage: Video Card */}
+          {/* Bottom Stage: Video Card with Scroll Interaction */}
           <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 1, duration: 1.2 }}
-            className="w-full max-w-5xl aspect-[16/9] rounded-[40px] overflow-hidden relative group shadow-[0_40px_100px_rgba(0,0,0,0.5)] border border-white/10"
+            style={{
+              scale: useTransform(smoothProgress, [0.3, 0.8], [0.9, 1.05]),
+              rotateX: useTransform(smoothProgress, [0.3, 0.8], [5, 0]),
+              y: useTransform(smoothProgress, [0.3, 0.8], [50, 0]),
+              opacity: useTransform(smoothProgress, [0.3, 0.5], [0.8, 1])
+            }}
+            className="w-full max-w-5xl aspect-[16/9] rounded-[40px] overflow-hidden relative group shadow-[0_40px_100px_rgba(0,0,0,0.5)] border border-white/10 perspective-1000"
           >
             <video
               src={heroVideo}

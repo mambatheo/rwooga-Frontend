@@ -1,12 +1,12 @@
 {
     "rewrites": [
         {
-            "source": "/api/:path*",
-            "destination": "https://awful-carlina-solvitafrica-ac088785.koyeb.app/:path*"
+            "source": "/api/(.*)",
+            "destination": "https://awful-carlina-solvitafrica-ac088785.koyeb.app/$1"
         },
         {
-            "source": "/((?!api|static|.*\\..*).*)",
-            "destination": "/index.html"
+            "source": "/(.*)",
+            "destination": "/"
         }
     ]
 }

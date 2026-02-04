@@ -1,8 +1,9 @@
 
 import React, { useState, useEffect } from 'react';
-import { HashRouter as Router, Routes, Route, Link, useLocation } from 'react-router-dom';
+import { HashRouter as Router, Routes, Route, Link, useLocation, Navigate } from 'react-router-dom';
 import { Menu, X, MessageCircle, Settings } from 'lucide-react';
 import toast, { Toaster } from 'react-hot-toast';
+import { useAuth } from './context/AuthContext';
 
 // Pages
 import Home from './pages/Home';
@@ -15,6 +16,8 @@ import Contact from './pages/Contact';
 import Admin from './pages/Admin';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
+import VerifyEmail from './pages/VerifyEmail';
+import Checkout from './pages/Checkout';
 import { authService } from './services/authService';
 
 // Assets
@@ -26,46 +29,12 @@ import Footer from './components/Footer';
 const App: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isCustomPrintingEnabled, setIsCustomPrintingEnabled] = useState(true);
-  const [user, setUser] = useState<{ name: string; email: string; role: string } | null>(null);
 
-  // Load user from session
-  useEffect(() => {
-    const initializeAuth = () => {
-      const accessToken = localStorage.getItem('access_token');
-      const storedUser = localStorage.getItem('rwooga_user');
+  const { user, logout } = useAuth();
 
-      if (accessToken && storedUser) {
-        setUser(JSON.parse(storedUser));
-      } else if (!accessToken && storedUser) {
-        // Clear legacy user without session
-        localStorage.removeItem('rwooga_user');
-      }
-    };
-
-    initializeAuth();
-  }, []);
-
-  const handleLogout = async () => {
-    try {
-      const refreshToken = localStorage.getItem('refresh_token');
-      if (refreshToken) {
-        await authService.logout(refreshToken);
-      }
-    } catch (error) {
-      console.error('Logout API error:', error);
-    } finally {
-      localStorage.removeItem('rwooga_user');
-      localStorage.removeItem('access_token');
-      localStorage.removeItem('refresh_token');
-      setUser(null);
-      toast.success('Successfully logged out');
-      window.location.hash = '/';
-    }
-  };
-
-  const handleLogin = (userData: { name: string; email: string; role: string }) => {
-    setUser(userData);
-    localStorage.setItem('rwooga_user', JSON.stringify(userData));
+  const handleLogout = () => {
+    logout();
+    window.location.hash = '/login';
   };
 
   // Initialize printing state from localStorage
@@ -103,19 +72,19 @@ const App: React.FC = () => {
                 <NavLink to="/portfolio">Portfolio</NavLink>
                 <NavLink to="/shop">Shop</NavLink>
                 <NavLink to="/contact">Contact</NavLink>
-
-                {isCustomPrintingEnabled && (
-                  <Link
-                    to="/custom-request"
-                    className="bg-brand-primary text-black px-8 py-3 rounded-full font-bold hover:scale-105 transition-all shadow-lg shadow-cyan-500/20 flex items-center"
-                  >
-                    Custom Design
-                  </Link>
-                )}
               </div>
 
               <div className="flex items-center space-x-4">
                 <div className="hidden md:block h-6 w-px bg-white/10 mx-4" />
+
+                {isCustomPrintingEnabled && (
+                  <Link
+                    to="/custom-request"
+                    className="bg-brand-primary text-black px-6 py-2 rounded-full font-bold hover:scale-105 transition-all shadow-lg shadow-cyan-500/20 hidden md:flex items-center text-sm"
+                  >
+                    Custom Request
+                  </Link>
+                )}
 
                 {user ? (
                   <div className="hidden md:flex items-center space-x-4">
@@ -130,14 +99,17 @@ const App: React.FC = () => {
                     )}
                     <button
                       onClick={handleLogout}
-                      className="text-xs font-bold text-red-400 hover:text-red-500 transition-colors"
+                      className="text-xs font-bold text-red-400 hover:text-red-500 transition-colors uppercase tracking-[0.2em] border-l border-white/10 pl-4 ml-4"
                     >
                       Logout
                     </button>
                   </div>
                 ) : (
                   <div className="hidden md:block">
-                    <Link to="/login" className="text-sm font-bold text-gray-400 hover:text-white transition-all uppercase tracking-widest">
+                    <Link
+                      to="/login"
+                      className="text-sm font-bold text-brand-primary hover:text-white transition-all uppercase tracking-widest border-2 border-brand-primary/20 px-6 py-2 rounded-full hover:border-brand-primary"
+                    >
                       Login
                     </Link>
                   </div>
@@ -216,8 +188,10 @@ const App: React.FC = () => {
             <Route path="/custom-request" element={<CustomRequest isEnabled={isCustomPrintingEnabled} />} />
             <Route path="/contact" element={<Contact />} />
             <Route path="/admin" element={<Admin user={user} handleLogout={handleLogout} isEnabled={isCustomPrintingEnabled} onToggle={togglePrinting} />} />
-            <Route path="/login" element={<Login onLogin={handleLogin} />} />
+            <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
+            <Route path="/verify-email/:id/:token" element={<VerifyEmail />} />
+            <Route path="/checkout" element={<Checkout />} />
           </Routes>
         </main>
 
