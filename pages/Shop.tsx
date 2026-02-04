@@ -23,7 +23,6 @@ const Shop = () => {
       ? PRODUCTS
       : PRODUCTS.filter(p => p.category === selectedCategory)
 
-  // --- Cart Logic ---
   const handleAddToCart = (product: any) => {
     dispatch(addToCart(product))
     setShowCart(true)
@@ -83,7 +82,7 @@ const Shop = () => {
           </div>
         </div>
 
-        {/* Product Grid */}
+        {/* product grid */}
         <motion.div
           layout
           className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12"
@@ -146,6 +145,7 @@ const Shop = () => {
                 <button
                   onClick={() => setShowCart(false)}
                   className="p-3 bg-white/5 rounded-full text-white hover:bg-white/10 transition-all"
+                  aria-label="Close cart"
                 >
                   <X size={24} />
                 </button>
@@ -172,6 +172,7 @@ const Shop = () => {
                           <button
                             onClick={() => handleRemoveFromCart(item.id)}
                             className="text-gray-500 hover:text-red-500 transition-colors"
+                            aria-label="Remove from cart"
                           >
                             <Trash2 size={18} />
                           </button>

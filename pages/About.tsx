@@ -156,8 +156,7 @@ const About: React.FC = () => {
 const StatItem: React.FC<{ number: string; label: string }> = ({ number, label }) => (
   <div className="flex flex-col items-center text-center">
     <h3
-      className="text-5xl md:text-7xl font-display font-black leading-none mb-4"
-      style={{ color: '#008000' }}
+      className="text-5xl md:text-7xl font-display font-black leading-none mb-4 text-green-600"
     >
       {number}
     </h3>
