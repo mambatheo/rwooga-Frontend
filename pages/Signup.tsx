@@ -111,7 +111,7 @@ const Signup: React.FC = () => {
                                 value={formData.phone}
                                 onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                                 className="w-full bg-white/5 border border-white/10 rounded-2xl p-4 text-white placeholder-gray-600 focus:border-brand-primary focus:bg-white/10 outline-none transition-all"
-                                placeholder="+250..."
+                                placeholder="07..."
                             />
                         </div>
 
