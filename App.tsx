@@ -190,7 +190,7 @@ const App: React.FC = () => {
             <Route path="/admin" element={<Admin user={user} handleLogout={handleLogout} isEnabled={isCustomPrintingEnabled} onToggle={togglePrinting} />} />
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
-            <Route path="/verify-email/:id/:token" element={<VerifyEmail />} />
+            <Route path="/verify-email/:email/:token" element={<VerifyEmail />} />
             <Route path="/checkout" element={<Checkout />} />
           </Routes>
         </main>

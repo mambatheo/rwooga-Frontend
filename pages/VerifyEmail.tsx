@@ -7,14 +7,14 @@ import { CheckCircle, XCircle, Loader2 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 const VerifyEmail: React.FC = () => {
-    const { id, token } = useParams<{ id: string; token: string }>();
+    const { email, token } = useParams<{ email: string; token: string }>();
     const navigate = useNavigate();
     const { verifyEmail, loading, error } = useAuth();
     const [status, setStatus] = useState<'verifying' | 'success' | 'error'>('verifying');
 
     useEffect(() => {
-        if (id && token) {
-            verifyEmail(id, token)
+        if (email && token) {
+            verifyEmail(email, token)
                 .then(() => {
                     setStatus('success');
                     toast.success('Email verified successfully! You can now log in.');
@@ -27,7 +27,7 @@ const VerifyEmail: React.FC = () => {
                     toast.error(err || 'Verification failed');
                 });
         }
-    }, [id, token, verifyEmail, navigate]);
+    }, [email, token, verifyEmail, navigate]);
 
     return (
         <div className="min-h-screen bg-brand-dark flex items-center justify-center px-4">

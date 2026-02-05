@@ -96,8 +96,8 @@ export const authService = {
         return handleResponse(response);
     },
 
-    async verifyEmail(id: string, token: string) {
-        const response = await fetch(`${API_BASE_URL}/auth/verify-email/${id}/${token}/`, {
+    async verifyEmail(email: string, token: string) {
+        const response = await fetch(`${API_BASE_URL}/auth/verify-email/${email}/${token}/`, {
             method: 'GET', // Or POST, but usually GET for direct links. Keeping it flexible.
             headers: { 'Content-Type': 'application/json' },
         });
