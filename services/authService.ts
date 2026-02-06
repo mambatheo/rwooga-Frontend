@@ -1,12 +1,20 @@
 
 import { API_BASE_URL } from '../constants';
 
-const handleResponse = async (response: Response): Promise<{ ok: boolean, status: number, data: any }> => {
+const handleResponse = async (response: Response) => {
+    const isJson = response.headers.get('content-type')?.includes('application/json');
+    const data = isJson ? await response.json() : null;
+
+    if (!response.ok) {
+        // Extract error message from various possible API error formats
+        const error = (data && (data.message || data.detail || (typeof data === 'string' ? data : JSON.stringify(data)))) || response.statusText;
+        throw new Error(error);
+    }
 
     return {
-        ok: response.ok,
+        ok: true,
         status: response.status,
-        data: await response.json()
+        data: data
     };
 };
 
@@ -42,7 +50,7 @@ export const authService = {
     },
 
     async refreshToken(refresh: string) {
-        const response = await fetch(`${API_BASE_URL}/auth/refresh_token/`, {
+        const response = await fetch(`${API_BASE_URL}/auth/refresh/`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ refresh }),
@@ -51,7 +59,7 @@ export const authService = {
     },
 
     async requestPasswordReset(email: string) {
-        const response = await fetch(`${API_BASE_URL}/auth/password_reset_request/`, {
+        const response = await fetch(`${API_BASE_URL}/auth/password-reset/`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ email }),
@@ -60,7 +68,7 @@ export const authService = {
     },
 
     async confirmPasswordReset(data: any) {
-        const response = await fetch(`${API_BASE_URL}/auth/password_reset_confirm/`, {
+        const response = await fetch(`${API_BASE_URL}/auth/password-reset/confirm/`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(data),
@@ -69,10 +77,10 @@ export const authService = {
     },
 
     async verifyEmail(email: string, token: string) {
-        const response = await fetch(`${API_BASE_URL}/auth/verify-email`, {
-            method: 'POST', // Or POST, but usually GET for direct links. Keeping it flexible.
+        const response = await fetch(`${API_BASE_URL}/auth/verify-email/`, {
+            method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email, token }), // Some APIs expect data in the body even for verification links
+            body: JSON.stringify({ email, token }),
         });
         return handleResponse(response);
     },

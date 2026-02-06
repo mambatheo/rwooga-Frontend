@@ -1,5 +1,5 @@
 
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback, ReactNode } from 'react';
 import { authService } from '../services/authService';
 import toast from 'react-hot-toast';
 
@@ -36,15 +36,25 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         setLoading(true);
         setError(null);
         try {
-            const data = await authService.login(credentials);
-            setUser(data.data.user);
-            // TODO: Store in session storage instead of localStorage for better security, or use httpOnly cookies
-            localStorage.setItem('access_token', data.data.access);
-            localStorage.setItem('refresh_token', data.data.refresh);
-            localStorage.setItem('user', JSON.stringify(data.data.user));
+            const { data } = await authService.login(credentials);
+            console.log('Login response:', data);
+
+            // Validate expected data structure
+            if (!data.user || !data.access) {
+                throw new Error('Invalid response from server');
+            }
+
+            setUser(data.user);
+            localStorage.setItem('access_token', data.access);
+            localStorage.setItem('refresh_token', data.refresh);
+            localStorage.setItem('user', JSON.stringify(data.user));
+            toast.success('Logged in successfully!');
         } catch (err: any) {
-            setError(err.message || 'Login failed');
-            throw err.message || 'Login failed';
+            console.error('Login error:', err);
+            const msg = err.message || 'Login failed';
+            setError(msg);
+            toast.error(msg);
+            throw err;
         } finally {
             setLoading(false);
         }
@@ -54,29 +64,34 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         setLoading(true);
         setError(null);
         try {
-            const data = await authService.register(userData);
-            return data;
+            const response = await authService.register(userData);
+            toast.success('Registration successful! Please check your email.');
+            return response;
         } catch (err: any) {
-            setError(err.message || 'Registration failed');
-            throw err.message || 'Registration failed';
+            const msg = err.message || 'Registration failed';
+            setError(msg);
+            toast.error(msg);
+            throw err;
         } finally {
             setLoading(false);
         }
     };
 
-    const verifyEmail = async (email: string, token: string) => {
+    const verifyEmail = useCallback(async (email: string, token: string) => {
         setLoading(true);
         setError(null);
         try {
-           const res = await authService.verifyEmail(email, token);
-           console.log("Verification response", res);
+            await authService.verifyEmail(email, token);
+            toast.success('Email verified successfully!');
         } catch (err: any) {
-            setError(err.message || 'Verification failed');
-            throw err.message || 'Verification failed';
+            const message = err.message || 'Verification failed';
+            setError(message);
+            toast.error(message);
+            throw err; // Re-throw to let component know it failed
         } finally {
             setLoading(false);
         }
-    };
+    }, []);
 
     const logout = () => {
         setUser(null);

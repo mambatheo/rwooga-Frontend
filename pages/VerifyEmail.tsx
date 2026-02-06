@@ -6,11 +6,10 @@ import { CheckCircle, XCircle, Loader2 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 const VerifyEmail: React.FC = () => {
-    const [searchParams] = useSearchParams(); // Fix: destructure the array correctly
-    const email = searchParams.get('email');
-    const token = searchParams.get('token');
-    
-    console.log({ email, token }); // Now this will work
+    const { email: emailParam, token: tokenParam } = useParams<{ email?: string; token?: string }>();
+    const [searchParams] = useSearchParams();
+    const email = searchParams.get('email') || emailParam;
+    const token = searchParams.get('token') || tokenParam;
     
     const navigate = useNavigate();
     const { verifyEmail, loading, error } = useAuth();
@@ -30,6 +29,8 @@ const VerifyEmail: React.FC = () => {
                     setStatus('error');
                     toast.error(err || 'Verification failed');
                 });
+        } else {
+            setStatus('error');
         }
     }, [email, token, verifyEmail, navigate]);
 

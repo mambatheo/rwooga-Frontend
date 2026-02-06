@@ -25,13 +25,13 @@ import logo from './assets/Rwooga logo.png';
 
 // Components
 import Footer from './components/Footer';
+import ProtectedRoute from './components/ProtectedRoute';
 
 const App: React.FC = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isCustomPrintingEnabled, setIsCustomPrintingEnabled] = useState(true);
 
   const { user, logout } = useAuth();
-
   const handleLogout = () => {
     logout();
     window.location.hash = '/login';
@@ -72,6 +72,9 @@ const App: React.FC = () => {
                 <NavLink to="/portfolio">Portfolio</NavLink>
                 <NavLink to="/shop">Shop</NavLink>
                 <NavLink to="/contact">Contact</NavLink>
+                {user?.is_admin && (
+                  <NavLink to="/admin">Admin</NavLink>
+                )}
               </div>
 
               <div className="flex items-center space-x-4">
@@ -92,11 +95,7 @@ const App: React.FC = () => {
                       <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest leading-none mb-1">{user.role}</span>
                       <span className="text-sm font-bold text-white">{user.name}</span>
                     </div>
-                    {user.role === 'admin' && (
-                      <Link to="/admin" className="p-2 bg-white/5 rounded-lg text-gray-400 hover:text-brand-primary transition-colors">
-                        <Settings size={20} />
-                      </Link>
-                    )}
+
                     <button
                       onClick={handleLogout}
                       className="text-xs font-bold text-red-400 hover:text-red-500 transition-colors uppercase tracking-[0.2em] border-l border-white/10 pl-4 ml-4"
@@ -185,13 +184,22 @@ const App: React.FC = () => {
             <Route path="/services" element={<Services />} />
             <Route path="/portfolio" element={<Portfolio />} />
             <Route path="/shop" element={<Shop />} />
-            <Route path="/custom-request" element={<CustomRequest isEnabled={isCustomPrintingEnabled} />} />
             <Route path="/contact" element={<Contact />} />
-            <Route path="/admin" element={<Admin user={user} handleLogout={handleLogout} isEnabled={isCustomPrintingEnabled} onToggle={togglePrinting} />} />
+
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<Signup />} />
+            <Route path="/verify-email" element={<VerifyEmail />} />
             <Route path="/verify-email/:email/:token" element={<VerifyEmail />} />
-            <Route path="/checkout" element={<Checkout />} />
+
+            {/* Protected Routes */}
+            <Route element={<ProtectedRoute />}>
+              <Route path="/custom-request" element={<CustomRequest isEnabled={isCustomPrintingEnabled} />} />
+              <Route path="/checkout" element={<Checkout />} />
+            </Route>
+
+            <Route element={<ProtectedRoute requiredRole="admin" />}>
+              <Route path="/admin" element={<Admin user={user} handleLogout={handleLogout} isEnabled={isCustomPrintingEnabled} onToggle={togglePrinting} />} />
+            </Route>
           </Routes>
         </main>
 

@@ -99,6 +99,17 @@
 </head>
 
 <body>
+  <script>
+    // Fix for HashRouter: when user clicks verify link from email (URL has no #),
+    // redirect to hash version so React Router can handle it
+    (function() {
+      var path = window.location.pathname;
+      var search = window.location.search || '';
+      if (!window.location.hash && path.includes('verify-email')) {
+        window.location.replace('/#' + path + search);
+      }
+    })();
+  </script>
   <div id="root"></div>
   <script type="module" src="/index.tsx"></script>
 </body>
